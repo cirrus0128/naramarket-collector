@@ -7,6 +7,10 @@ from database import Database
 from datetime import datetime, timedelta
 import calendar
 
+# 실시간 출력 설정
+import functools
+print = functools.partial(print, flush=True)
+
 class DataCollector:
     def __init__(self):
         self.api = NaramarketAPI()
@@ -47,7 +51,7 @@ class DataCollector:
         start_date = yesterday.strftime('%Y%m%d') + '0000'
         end_date = yesterday.strftime('%Y%m%d') + '2359'
         
-        print(f"\n📅 일일 수집: {yesterday.strftime('%Y-%m-%d')}")
+        print(f"일일 수집: {yesterday.strftime('%Y-%m-%d')}")
         print("=" * 40)
         
         saved, total = self.collect_all_pages(start_date, end_date)
@@ -57,8 +61,8 @@ class DataCollector:
             'getScsbidListSttusThng', total, saved, 'success'
         )
         
-        print(f"\n✅ 완료: {saved}건 저장")
-        print(f"📡 API 호출: {self.api.call_count}회")
+        print(f"완료: {saved}건 저장")
+        print(f"API 호출: {self.api.call_count}회")
         
         return saved
     
@@ -67,7 +71,7 @@ class DataCollector:
         last_day = calendar.monthrange(year, month)[1]
         end_date = f"{year}{month:02d}{last_day}2359"
         
-        print(f"\n📅 {year}년 {month}월 수집")
+        print(f"{year}년 {month}월 수집 시작")
         print("=" * 40)
         
         saved, total = self.collect_all_pages(start_date, end_date)
@@ -77,8 +81,9 @@ class DataCollector:
             'getScsbidListSttusThng', total, saved, 'success'
         )
         
-        print(f"\n✅ 완료: {saved}건 저장")
-        print(f"📡 API 호출: {self.api.call_count}회")
+        print("=" * 40)
+        print(f"완료: {saved}건 저장")
+        print(f"API 호출: {self.api.call_count}회")
         
         return saved
 
