@@ -1,0 +1,47 @@
+name: Update Dashboard
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'  # 6시간마다
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["Daily Data Collection", "Monthly Historical Collection"]
+    types:
+      - completed
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Generate dashboard data
+      env:
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      run: |
+        mkdir -p docs
+        cd src
+        python dashboard_api.py > ../docs/data.json
+        cat ../docs/data.json
+    
+    - name: Commit and push
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add docs/data.json
+        git diff --quiet && git diff --staged --quiet || git commit -m "Update dashboard data"
+        git push
