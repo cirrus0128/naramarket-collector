@@ -1,0 +1,48 @@
+name: Daily Report with Email
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # 매일 한국시간 09:00 (UTC 00:00)
+  workflow_dispatch:
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Generate report
+      id: report
+      env:
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      run: |
+        cd src
+        python report_generator.py > report.txt
+        cat report.txt
+        echo "report<<EOF" >> $GITHUB_OUTPUT
+        cat report.txt >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+    
+    - name: Send email
+      uses: dawidd6/action-send-mail@v3
+      with:
+        server_address: smtp.gmail.com
+        server_port: 587
+        username: ${{ secrets.EMAIL_USERNAME }}
+        password: ${{ secrets.EMAIL_PASSWORD }}
+        subject: "[나라장터] 일일 데이터 수집 리포트"
+        to: cirrus01@naver.com
+        from: 나라장터 수집기
+        body: ${{ steps.report.outputs.report }}
