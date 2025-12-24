@@ -1,4 +1,4 @@
-name: Daily Report with Email
+name: Daily Report
 
 on:
   schedule:
@@ -8,6 +8,8 @@ on:
 jobs:
   report:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
     
     steps:
     - name: Checkout repository
@@ -35,14 +37,9 @@ jobs:
         cat report.txt >> $GITHUB_OUTPUT
         echo "EOF" >> $GITHUB_OUTPUT
     
-    - name: Send email
-      uses: dawidd6/action-send-mail@v3
+    - name: Create Issue
+      uses: peter-evans/create-issue-from-file@v5
       with:
-        server_address: smtp.gmail.com
-        server_port: 587
-        username: ${{ secrets.EMAIL_USERNAME }}
-        password: ${{ secrets.EMAIL_PASSWORD }}
-        subject: "[나라장터] 일일 데이터 수집 리포트"
-        to: cirrus01@naver.com
-        from: 나라장터 수집기
-        body: ${{ steps.report.outputs.report }}
+        title: "📊 일일 리포트 - ${{ github.run_id }}"
+        content-filepath: src/report.txt
+        labels: report
