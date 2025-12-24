@@ -2,13 +2,14 @@ name: Daily Report
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # 매일 한국시간 09:00 (UTC 00:00)
+    - cron: '0 0 * * *'
   workflow_dispatch:
 
 jobs:
   report:
     runs-on: ubuntu-latest
     permissions:
+      contents: read
       issues: write
     
     steps:
@@ -26,20 +27,17 @@ jobs:
         pip install -r requirements.txt
     
     - name: Generate report
-      id: report
       env:
         DATABASE_URL: ${{ secrets.DATABASE_URL }}
       run: |
         cd src
-        python report_generator.py > report.txt
-        cat report.txt
-        echo "report<<EOF" >> $GITHUB_OUTPUT
-        cat report.txt >> $GITHUB_OUTPUT
-        echo "EOF" >> $GITHUB_OUTPUT
+        python report_generator.py | tee report.txt
     
     - name: Create Issue
-      uses: peter-evans/create-issue-from-file@v5
-      with:
-        title: "📊 일일 리포트 - ${{ github.run_id }}"
-        content-filepath: src/report.txt
-        labels: report
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        gh issue create \
+          --title "📊 일일 리포트 - $(date +'%Y-%m-%d')" \
+          --body-file src/report.txt \
+          --label "report"
