@@ -1,7 +1,7 @@
 {
-  "total_count": 52708,
-  "size_mb": 26.25,
-  "size_percent": 0.85,
+  "total_count": 56769,
+  "size_mb": 28.19,
+  "size_percent": 0.92,
   "monthly": [
     {
       "month": "2025-12",
@@ -38,9 +38,21 @@
     {
       "month": "2024-05",
       "count": 6335
+    },
+    {
+      "month": "2024-01",
+      "count": 4061
     }
   ],
   "logs": [
+    {
+      "type": "monthly",
+      "start": "202401010000",
+      "end": "202401312359",
+      "count": 4065,
+      "status": "success",
+      "date": "2025-12-27 03:15"
+    },
     {
       "type": "monthly",
       "start": "202405010000",
@@ -112,15 +124,7 @@
       "count": 6876,
       "status": "success",
       "date": "2025-12-24 00:07"
-    },
-    {
-      "type": "daily",
-      "start": "202512220000",
-      "end": "202512222359",
-      "count": 439,
-      "status": "success",
-      "date": "2025-12-23 22:49"
     }
   ],
-  "updated_at": "2025-12-27 02:49:20"
+  "updated_at": "2025-12-27 03:16:01"
 }
